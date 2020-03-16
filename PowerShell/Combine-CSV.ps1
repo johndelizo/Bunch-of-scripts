@@ -22,8 +22,8 @@ get-childItem $SourceDirectory -Filter "*.csv" | foreach {
     $filePath = $_.FullName
     $lines =  $lines = Get-Content $filePath  
     $linesToWrite = switch($RemoveFirstLine) {
-           $true  {$lines}
-           $false {$lines | Select -Skip 1}
+           $false {$lines}
+           $true {$lines | Select -Skip 1}
     }
 
     Add-Content ($SourceDirectory + "\" + $Destination + ".csv") $linesToWrite

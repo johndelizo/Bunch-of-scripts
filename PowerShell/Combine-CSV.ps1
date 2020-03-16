@@ -20,12 +20,18 @@ if (Test-Path ($SourceDirectory + "\" + $Destination + ".csv")) {
 
 get-childItem $SourceDirectory -Filter "*.csv" | foreach {
     $filePath = $_.FullName
-    $lines =  $lines = Get-Content $filePath  
+
+    if (!(Test-Path ($SourceDirectory + "\" + $Destination + ".csv")) -and $RemoveFirstLine) {
+         $headerLines = Get-Content $filePath -First 1
+         Add-Content ($SourceDirectory + "\" + $Destination + ".csv") $headerLines
+    }
+
+    $lines = $lines = Get-Content $filePath  
     $linesToWrite = switch($RemoveFirstLine) {
            $false {$lines}
            $true {$lines | Select -Skip 1}
     }
 
     Add-Content ($SourceDirectory + "\" + $Destination + ".csv") $linesToWrite
-   
-    }
+
+}

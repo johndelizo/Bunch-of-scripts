@@ -1,0 +1,39 @@
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - JOHNDELIZO.WIC/JOHNDELIZO.WIC.API/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  targetProjectPrefix: 'API'
+
+steps:
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet build $(targetProjectPrefix) $(buildConfiguration)'
+  inputs:
+    command: 'build'
+    projects: '*/**/JOHNDELIZO.WIC.$(targetProjectPrefix).csproj'
+    arguments: '-v d  --configuration $(buildConfiguration)'
+    
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet publish $(targetProjectPrefix) $(buildConfiguration)'
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: '*/**/JOHNDELIZO.WIC.$(targetProjectPrefix).csproj'
+    arguments: --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/$(targetProjectPrefix)
+    zipAfterPublish: true
+    modifyOutputPath: true
+  
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Build Artifacts $(targetProjectPrefix) $(buildConfiguration)'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(targetProjectPrefix)'
+    ArtifactName: 'drop'
